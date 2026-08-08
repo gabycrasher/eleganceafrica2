@@ -56,11 +56,52 @@
     });
   }
 
+  function renderCatalog(tag = 'all') {
+    const grid = document.querySelector('[data-product-grid]');
+    if (!grid || !root.EleganceCatalog) return;
+    const products = root.EleganceCatalog.filterProducts(tag);
+    grid.innerHTML = products.map(productCardMarkup).join('');
+    document.querySelector('[data-empty-state]')?.classList.toggle('d-none', products.length !== 0);
+  }
+
+  function initCatalogFilters() {
+    const controls = document.querySelectorAll('[data-filter]');
+    if (!controls.length) return;
+    controls.forEach((control) => control.addEventListener('click', () => {
+      controls.forEach((item) => { const active = item === control; item.classList.toggle('is-active', active); item.setAttribute('aria-pressed', String(active)); });
+      renderCatalog(control.dataset.filter);
+    }));
+    document.querySelector('[data-reset-filter]')?.addEventListener('click', () => controls[0].click());
+    renderCatalog();
+  }
+
+  function renderProductPage() {
+    const view = document.querySelector('[data-product-view]');
+    if (!view || !root.EleganceCatalog) return;
+    const product = root.EleganceCatalog.getProductById(new URLSearchParams(location.search).get('id'));
+    const missing = document.querySelector('[data-product-not-found]');
+    const related = document.querySelector('[data-related-grid]');
+    if (!product) { missing.hidden = false; related.innerHTML = root.EleganceCatalog.products.slice(0, 4).map(productCardMarkup).join(''); return; }
+    view.hidden = false; document.title = `${product.name} | Elegance Africa`;
+    document.querySelector('[data-product-name]').textContent = product.name;
+    document.querySelector('[data-product-price]').textContent = product.price;
+    document.querySelector('[data-product-description]').textContent = product.description;
+    document.querySelector('[data-product-availability]').textContent = product.availability;
+    document.querySelector('[data-product-care]').textContent = product.care;
+    const mainImage = document.querySelector('[data-gallery-main]'); mainImage.src = product.images[0]; mainImage.alt = `${product.name}, ${product.description}`;
+    document.querySelector('[data-product-whatsapp]').href = root.EleganceCatalog.buildWhatsAppUrl(product.name);
+    document.querySelector('[data-gallery-thumbs]').innerHTML = product.images.map((image, index) => `<button type="button" data-gallery-image="${image}" aria-label="View image ${index + 1} of ${product.name}"><img src="${image}" alt=""></button>`).join('');
+    document.querySelectorAll('[data-gallery-image]').forEach((button) => button.addEventListener('click', () => { mainImage.src = button.dataset.galleryImage; }));
+    related.innerHTML = root.EleganceCatalog.products.filter((item) => item.id !== product.id).slice(0, 4).map(productCardMarkup).join('');
+  }
+
   function init() {
     markActiveNavigation();
     initImageFallbacks();
     renderFeaturedProducts();
     initNewsletter();
+    initCatalogFilters();
+    renderProductPage();
     initReveal();
   }
 
