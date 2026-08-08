@@ -95,6 +95,21 @@
     related.innerHTML = root.EleganceCatalog.products.filter((item) => item.id !== product.id).slice(0, 4).map(productCardMarkup).join('');
   }
 
+  function initContactForm() {
+    const form = document.querySelector('[data-contact-form]');
+    if (!form) return;
+    const status = form.querySelector('.form-status');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.checkValidity()) { form.classList.add('was-validated'); status.textContent = 'Please complete the required fields.'; return; }
+      const values = Object.fromEntries(new FormData(form).entries());
+      const subject = `Elegance Africa enquiry: ${values.interest}`;
+      const body = `Name: ${values.name}\nEmail: ${values.email}\nPhone/WhatsApp: ${values.phone || 'Not provided'}\nInterest: ${values.interest}\n\n${values.message}`;
+      status.textContent = 'Your email application is opening with the enquiry prepared.';
+      root.location.href = `mailto:eeleganceafrica@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+  }
+
   function init() {
     markActiveNavigation();
     initImageFallbacks();
@@ -102,6 +117,7 @@
     initNewsletter();
     initCatalogFilters();
     renderProductPage();
+    initContactForm();
     initReveal();
   }
 
