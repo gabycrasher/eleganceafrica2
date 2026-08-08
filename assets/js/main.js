@@ -34,9 +34,33 @@
     items.forEach((item) => observer.observe(item));
   }
 
+  function productCardMarkup(product, index = 0) {
+    return `<article class="col-12 col-md-6 col-xl-3" data-reveal style="--delay:${index * 70}ms"><a class="product-card" href="product.html?id=${encodeURIComponent(product.id)}"><span class="product-card__media"><img src="${product.images[0]}" alt="${product.name}, ${product.description}" loading="lazy"></span><span class="product-card__meta"><small>${product.category}</small><strong>${product.name}</strong><span>${product.price}</span></span></a></article>`;
+  }
+
+  function renderFeaturedProducts() {
+    const grid = document.querySelector('[data-featured-grid]');
+    if (!grid || !root.EleganceCatalog) return;
+    grid.innerHTML = root.EleganceCatalog.products.filter((product) => product.featured).slice(0, 4).map(productCardMarkup).join('');
+  }
+
+  function initNewsletter() {
+    const form = document.querySelector('[data-newsletter-form]');
+    if (!form) return;
+    const status = form.parentElement.querySelector('.form-status');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.checkValidity()) { form.classList.add('was-validated'); status.textContent = 'Please enter a valid email address.'; return; }
+      status.textContent = 'Thank you. Newsletter delivery will be connected in the next business-ready version.';
+      form.reset(); form.classList.remove('was-validated');
+    });
+  }
+
   function init() {
     markActiveNavigation();
     initImageFallbacks();
+    renderFeaturedProducts();
+    initNewsletter();
     initReveal();
   }
 
