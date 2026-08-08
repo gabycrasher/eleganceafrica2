@@ -60,6 +60,10 @@ for (const page of pages) {
     assert.match(html, /Explore hair/);
     assert.match(html, /\+256 765 897 583/);
     assert.match(html, /eeleganceafrica@gmail\.com/);
+    const footer = html.match(/<footer class="site-footer">[\s\S]*?<\/footer>/)?.[0] || '';
+    for (const requiredHref of ['index.html', 'shop.html', 'product.html', 'about.html', 'delivery-faq.html', 'contact.html', 'policies.html', 'policies.html#privacy', 'policies.html#terms', 'policies.html#returns', 'policies.html#shipping']) {
+      assert.match(footer, new RegExp(`href="${requiredHref.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`), `${page} footer must link to ${requiredHref}`);
+    }
   });
 }
 

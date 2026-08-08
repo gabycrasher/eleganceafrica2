@@ -7,6 +7,10 @@ test('Shop exposes all approved filters and catalogue states', () => {
   for (const tag of ['all', 'curly', 'straight', 'wavy', 'bob', 'statement']) assert.match(html, new RegExp(`data-filter="${tag}"`));
   assert.match(html, /data-product-grid/); assert.match(html, /data-empty-state/);
   assert.match(html, /Fragrance/); assert.match(html, /Beauty/); assert.match(html, /Accessories/); assert.match(html, /Expanding soon/);
+  assert.match(html, /<noscript>[\s\S]*?<\/noscript>/);
+  for (const id of ['amara-coil', 'zuri-straight', 'nia-wave', 'imani-crop', 'sanaa-burgundy', 'aya-bob']) {
+    assert.match(html, new RegExp(`product\\.html\\?id=${id}`));
+  }
 });
 
 test('Product page exposes reusable gallery, facts, CTA, and fallback hooks', () => {
