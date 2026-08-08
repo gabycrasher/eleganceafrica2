@@ -35,7 +35,7 @@
   }
 
   function productCardMarkup(product, index = 0) {
-    return `<article class="col-12 col-md-6 col-xl-3" data-reveal style="--delay:${index * 70}ms"><a class="product-card" href="product.html?id=${encodeURIComponent(product.id)}"><span class="product-card__media"><img src="${product.images[0]}" alt="${product.name}, ${product.description}" loading="lazy"></span><span class="product-card__meta"><small>${product.category}</small><strong>${product.name}</strong><span>${product.price}</span></span></a></article>`;
+    return `<article class="col-12 col-md-6 col-xl-3"><a class="product-card" href="product.html?id=${encodeURIComponent(product.id)}"><span class="product-card__media"><img src="${product.images[0]}" alt="${product.name}, ${product.description}" loading="lazy"></span><span class="product-card__meta"><small>${product.category}</small><strong>${product.name}</strong><span>${product.price}</span></span></a></article>`;
   }
 
   function renderFeaturedProducts() {
@@ -81,7 +81,7 @@
     const product = root.EleganceCatalog.getProductById(new URLSearchParams(location.search).get('id'));
     const missing = document.querySelector('[data-product-not-found]');
     const related = document.querySelector('[data-related-grid]');
-    if (!product) { missing.hidden = false; related.innerHTML = root.EleganceCatalog.products.slice(0, 4).map(productCardMarkup).join(''); return; }
+    if (!product) { view.hidden = true; missing.hidden = false; related.innerHTML = root.EleganceCatalog.products.slice(0, 4).map(productCardMarkup).join(''); return; }
     view.hidden = false; document.title = `${product.name} | Elegance Africa`;
     document.querySelector('[data-product-name]').textContent = product.name;
     document.querySelector('[data-product-price]').textContent = product.price;
@@ -111,6 +111,7 @@
   }
 
   function init() {
+    document.documentElement.classList.add('js-ready');
     markActiveNavigation();
     initImageFallbacks();
     renderFeaturedProducts();
