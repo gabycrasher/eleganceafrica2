@@ -33,8 +33,9 @@ a { color: inherit; }
 .section-pad { padding-block: clamp(4.5rem, 8vw, 8rem); }
 .dark-section { background: var(--ink); color: var(--ivory); }
 .site-footer { background: var(--ink); color: var(--ivory); padding: 4rem 0 2rem; }
-.whatsapp-float { align-items: center; background: #1f8f55; border-radius: 999px; bottom: 1rem; box-shadow: var(--shadow); color: white; display: flex; gap: .55rem; padding: .8rem 1rem; position: fixed; right: 1rem; text-decoration: none; z-index: 1040; }
-:focus-visible { outline: 3px solid var(--gold-light); outline-offset: 3px; }
+.whatsapp-float { align-items: center; background: #176d3e; border-radius: 999px; bottom: 1rem; box-shadow: var(--shadow); color: white; display: flex; gap: .55rem; padding: .8rem 1rem; position: fixed; right: 1rem; text-decoration: none; z-index: 1040; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.dark-section :focus-visible, .site-footer :focus-visible { outline-color: var(--gold-light); }
 [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
 [data-reveal].is-visible { opacity: 1; transform: none; }
 @media (max-width: 575.98px) { .whatsapp-float span { display: none; } }
