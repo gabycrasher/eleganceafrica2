@@ -140,6 +140,7 @@
     setContent('[data-product-og-description]', description);
     setContent('[data-product-og-image]', 'assets/images/nia-wave-3.jpeg');
     setContent('[data-product-og-url]', 'product.html');
+    setContent('[data-product-og-type]', 'website');
     document.querySelector('[data-product-schema]')?.remove();
   }
 

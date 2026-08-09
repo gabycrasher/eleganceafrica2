@@ -110,5 +110,6 @@ test('static product pages expose product-specific sharing metadata without offe
     assert.match(html, new RegExp(`<title>${name} \\| Elegance Africa</title>`));
     assert.match(html, /name="description"/); assert.match(html, /property="og:title"/); assert.match(html, /property="og:description"/); assert.match(html, /property="og:image"/); assert.match(html, /name="twitter:title"/); assert.match(html, /name="twitter:image"/);
     assert.match(html, new RegExp(`href="\.\.\/products/${id}\\.html"`)); assert.match(html, new RegExp(`\.\.\/assets\/images\/${image}`)); assert.match(html, /"@type":"Product"/); assert.match(html, /"@type":"Organization"/); assert.doesNotMatch(html, /"price"\s*:/); assert.doesNotMatch(html, /"@type":"Offer"/);
+    assert.match(html, /bootstrap@5\.3\.8/); assert.match(html, /fonts\.googleapis\.com/); assert.match(html, /fonts\.gstatic\.com/);
   }
 });
