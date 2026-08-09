@@ -92,8 +92,9 @@
     const product = root.EleganceCatalog.getProductById(new URLSearchParams(location.search).get('id'));
     const missing = document.querySelector('[data-product-not-found]');
     const related = document.querySelector('[data-related-grid]');
-    if (!product) { view.hidden = true; missing.hidden = false; related.innerHTML = root.EleganceCatalog.products.slice(0, 4).map(productCardMarkup).join(''); return; }
+    if (!product) { document.querySelector('[data-product-schema]')?.remove(); view.hidden = true; missing.hidden = false; related.innerHTML = root.EleganceCatalog.products.slice(0, 4).map(productCardMarkup).join(''); return; }
     view.hidden = false; document.title = `${product.name} | Elegance Africa`;
+    updateProductMetadata(product);
     document.querySelector('[data-product-name]').textContent = product.name;
     document.querySelector('[data-product-price]').textContent = product.price;
     document.querySelector('[data-product-description]').textContent = product.description;
@@ -111,6 +112,22 @@
     document.querySelector('[data-gallery-thumbs]').innerHTML = product.images.map((image, index) => `<button type="button" data-gallery-image="${image}" aria-label="View image ${index + 1} of ${product.name}"><img src="${image}" alt=""></button>`).join('');
     document.querySelectorAll('[data-gallery-image]').forEach((button) => button.addEventListener('click', () => { mainImage.src = button.dataset.galleryImage; }));
     related.innerHTML = root.EleganceCatalog.products.filter((item) => item.id !== product.id).slice(0, 4).map(productCardMarkup).join('');
+  }
+
+  function updateProductMetadata(product) {
+    const canonical = `product.html?id=${encodeURIComponent(product.id)}`;
+    const setContent = (selector, content) => { const element = document.querySelector(selector); if (element) element.setAttribute('content', content); };
+    document.querySelector('[data-product-canonical]')?.setAttribute('href', canonical);
+    setContent('meta[name="description"]', product.description);
+    setContent('[data-product-og-title]', `${product.name} | Elegance Africa`);
+    setContent('[data-product-og-description]', product.description);
+    setContent('[data-product-og-image]', product.images[0]);
+    setContent('[data-product-og-url]', canonical);
+    const schema = document.querySelector('[data-product-schema]');
+    if (schema) schema.textContent = JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'Product', name: product.name, image: product.images,
+      description: product.description, brand: { '@type': 'Organization', name: 'Elegance Africa' }
+    }).replace(/</g, '\\u003c');
   }
 
   function selectedProductOptions() {

@@ -50,6 +50,7 @@ for (const page of pages) {
     assert.match(html, /assets\/js\/main\.js/);
     assert.match(html, /meta name="theme-color" content="#0b0a09"/);
     assert.match(html, /meta name="description"/);
+    assert.match(html, /rel="icon" href="assets\/images\/favicon\.svg" type="image\/svg\+xml"/);
     assert.match(html, /fonts\.googleapis\.com/);
     assert.match(html, /fonts\.gstatic\.com/);
     assert.match(html, /integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8\+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"/);
@@ -83,4 +84,17 @@ test('FAQ uses the Bootstrap runtime and accessible accordion states', () => {
   assert.match(html, /data-bs-parent="#eleganceFaq"/);
   assert.match(html, /accordion-collapse/);
   assert.match(html, /accordion-body/);
+});
+
+test('site includes share metadata and a branded 404 page', () => {
+  const home = fs.readFileSync('index.html', 'utf8');
+  const notFound = fs.readFileSync('404.html', 'utf8');
+  for (const value of ['rel="icon"', 'property="og:title"', 'property="og:image"', 'name="twitter:card"', 'rel="preload"']) assert.match(home, new RegExp(value));
+  assert.match(notFound, /Page not found/i);
+  assert.match(notFound, /shop\.html/);
+});
+
+test('product page has a structured-data hook', () => {
+  const html = fs.readFileSync('product.html', 'utf8');
+  assert.match(html, /data-product-schema/);
 });

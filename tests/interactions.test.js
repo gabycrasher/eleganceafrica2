@@ -48,3 +48,16 @@ test('product page renders active options and refreshes WhatsApp enquiry after a
   density.value = '180%'; density.emit('change');
   assert.equal(whatsapp.href, 'Sample|16"|180%'); assert.equal(mainImage.src, 'image.jpeg');
 });
+
+test('product page publishes product-specific metadata without an invented price', () => {
+  const selectors = new Map(); const element = (selector) => { const item = new Element(); item.attributes = {}; item.setAttribute = (name, value) => { item.attributes[name] = value; }; selectors.set(selector, item); return item; };
+  const view = element('[data-product-view]'); element('[data-product-not-found]'); element('[data-related-grid]'); element('[data-product-name]'); element('[data-product-price]'); const description = element('[data-product-description]'); element('[data-product-availability]'); element('[data-product-care]'); element('[data-product-style]'); element('[data-gallery-main]'); const length = Object.assign(element('[data-product-length]'), { value: '12"' }); const density = Object.assign(element('[data-product-density]'), { value: '130%' }); element('[data-product-whatsapp]'); element('[data-gallery-thumbs]');
+  selectors.set('[data-product-selector-template]', { content: { cloneNode: () => ({}) } }); description.after = () => {};
+  const canonical = element('[data-product-canonical]'); const descriptionMeta = element('meta[name="description"]'); const titleMeta = element('[data-product-og-title]'); const openGraphDescription = element('[data-product-og-description]'); const imageMeta = element('[data-product-og-image]'); const urlMeta = element('[data-product-og-url]'); const schema = element('[data-product-schema]');
+  const document = { title: '', body: { dataset: {} }, documentElement: { classList: { add() {} } }, addEventListener() {}, querySelector: (selector) => selectors.get(selector) || null, querySelectorAll: () => [] };
+  const product = { id: 'sample', name: 'Sample', price: 'Price on request', description: 'Description', availability: 'Personal confirmation', care: 'Care', wearItHow: 'Wear it boldly.', lengths: ['12"'], densities: ['130%'], images: ['image.jpeg'] };
+  const site = runSite(document, { products: [product], getProductById: () => product, buildWhatsAppUrl: () => '' }, '?id=sample');
+  site.renderProductPage();
+  assert.equal(view.hidden, false); assert.equal(canonical.attributes.href, 'product.html?id=sample'); assert.equal(descriptionMeta.attributes.content, 'Description'); assert.equal(titleMeta.attributes.content, 'Sample | Elegance Africa'); assert.equal(openGraphDescription.attributes.content, 'Description'); assert.equal(imageMeta.attributes.content, 'image.jpeg'); assert.equal(urlMeta.attributes.content, 'product.html?id=sample');
+  const data = JSON.parse(schema.textContent); assert.equal(data.name, 'Sample'); assert.deepEqual(data.image, ['image.jpeg']); assert.equal(data.brand.name, 'Elegance Africa'); assert.equal('price' in data, false); assert.equal('offers' in data, false);
+});
