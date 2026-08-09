@@ -92,9 +92,23 @@ test('site includes share metadata and a branded 404 page', () => {
   for (const value of ['rel="icon"', 'property="og:title"', 'property="og:image"', 'name="twitter:card"', 'rel="preload"']) assert.match(home, new RegExp(value));
   assert.match(notFound, /Page not found/i);
   assert.match(notFound, /shop\.html/);
+  for (const value of ['<html lang="en">', 'rel="icon" href="assets/images/favicon.svg"', 'id="site-header"', 'id="main-content"', 'site-footer', 'wa\.me/256765897583']) assert.match(notFound, new RegExp(value));
 });
 
 test('product page has a structured-data hook', () => {
   const html = fs.readFileSync('product.html', 'utf8');
   assert.match(html, /data-product-schema/);
+});
+
+test('static product pages expose product-specific sharing metadata without offers', () => {
+  const products = [
+    ['amara-coil', 'The Amara Coil', 'amara-coil-1.jpeg'], ['zuri-straight', 'The Zuri Straight', 'zuri-straight-1.jpeg'], ['nia-wave', 'The Nia Wave', 'nia-wave-1.jpeg'],
+    ['imani-crop', 'The Imani Crop', 'imani-crop-1.jpeg'], ['sanaa-burgundy', 'The Sanaa Burgundy', 'sanaa-burgundy-1.jpeg'], ['aya-bob', 'The Aya Bob', 'aya-bob-1.jpeg']
+  ];
+  for (const [id, name, image] of products) {
+    const html = fs.readFileSync(`products/${id}.html`, 'utf8');
+    assert.match(html, new RegExp(`<title>${name} \\| Elegance Africa</title>`));
+    assert.match(html, /name="description"/); assert.match(html, /property="og:title"/); assert.match(html, /property="og:description"/); assert.match(html, /property="og:image"/); assert.match(html, /name="twitter:title"/); assert.match(html, /name="twitter:image"/);
+    assert.match(html, new RegExp(`href="\.\.\/products/${id}\\.html"`)); assert.match(html, new RegExp(`\.\.\/assets\/images\/${image}`)); assert.match(html, /"@type":"Product"/); assert.match(html, /"@type":"Organization"/); assert.doesNotMatch(html, /"price"\s*:/); assert.doesNotMatch(html, /"@type":"Offer"/);
+  }
 });

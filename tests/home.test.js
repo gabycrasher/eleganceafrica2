@@ -18,7 +18,7 @@ test('homepage contains the complete editorial journey', () => {
   assert.match(html, /data-featured-grid/);
   assert.match(html, /data-newsletter-form/);
   assert.match(html, /Newsletter integration is being prepared/);
-  assert.match(html, /<noscript>[\s\S]*?product\.html\?id=amara-coil[\s\S]*?Price on request[\s\S]*?<\/noscript>/);
+  assert.match(html, /<noscript>[\s\S]*?products\/amara-coil\.html[\s\S]*?Price on request[\s\S]*?<\/noscript>/);
 });
 
 test('homepage contains an interactive signature quiz', () => {

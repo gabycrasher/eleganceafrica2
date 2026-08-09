@@ -31,7 +31,7 @@ test('quiz progresses through answers and renders the recommended product', () =
   const document = { body: { dataset: {} }, documentElement: { classList: { add() {} } }, addEventListener() {}, querySelector: (selector) => selector === '[data-signature-quiz]' ? quiz : null, querySelectorAll: () => [] };
   const site = runSite(document, { recommendProduct: () => ({ id: 'sanaa-burgundy', name: 'The Sanaa Burgundy', description: 'Bold curl.' }) });
   site.initSignatureQuiz(); next[0].emit('click'); next[1].emit('click'); form.emit('submit');
-  assert.equal(steps[0].hidden, true); assert.equal(steps[1].hidden, true); assert.equal(steps[2].queries.legend.focused, true); assert.equal(form.hidden, true); assert.equal(result.hidden, false); assert.match(result.innerHTML, /The Sanaa Burgundy/); assert.match(result.innerHTML, /product\.html\?id=sanaa-burgundy/);
+  assert.equal(steps[0].hidden, true); assert.equal(steps[1].hidden, true); assert.equal(steps[2].queries.legend.focused, true); assert.equal(form.hidden, true); assert.equal(result.hidden, false); assert.match(result.innerHTML, /The Sanaa Burgundy/); assert.match(result.innerHTML, /products\/sanaa-burgundy\.html/);
 });
 
 test('product page renders active options and refreshes WhatsApp enquiry after a selection change', () => {
@@ -60,4 +60,14 @@ test('product page publishes product-specific metadata without an invented price
   site.renderProductPage();
   assert.equal(view.hidden, false); assert.equal(canonical.attributes.href, 'product.html?id=sample'); assert.equal(descriptionMeta.attributes.content, 'Description'); assert.equal(titleMeta.attributes.content, 'Sample | Elegance Africa'); assert.equal(openGraphDescription.attributes.content, 'Description'); assert.equal(imageMeta.attributes.content, 'image.jpeg'); assert.equal(urlMeta.attributes.content, 'product.html?id=sample');
   const data = JSON.parse(schema.textContent); assert.equal(data.name, 'Sample'); assert.deepEqual(data.image, ['image.jpeg']); assert.equal(data.brand.name, 'Elegance Africa'); assert.equal('price' in data, false); assert.equal('offers' in data, false);
+});
+
+test('invalid dynamic product ids restore neutral metadata and remove structured data', () => {
+  const selectors = new Map(); const element = (selector) => { const item = new Element(); item.attributes = {}; item.setAttribute = (name, value) => { item.attributes[name] = value; }; selectors.set(selector, item); return item; };
+  const view = element('[data-product-view]'); const missing = element('[data-product-not-found]'); const related = element('[data-related-grid]'); const canonical = element('[data-product-canonical]'); const descriptionMeta = element('meta[name="description"]'); const titleMeta = element('[data-product-og-title]'); const openGraphDescription = element('[data-product-og-description]'); const imageMeta = element('[data-product-og-image]'); const urlMeta = element('[data-product-og-url]'); const schema = element('[data-product-schema]'); schema.remove = () => { schema.removed = true; };
+  const document = { title: 'The Previous Product | Elegance Africa', body: { dataset: {} }, documentElement: { classList: { add() {} } }, addEventListener() {}, querySelector: (selector) => selectors.get(selector) || null, querySelectorAll: () => [] };
+  const fallbackProduct = { id: 'sample', name: 'Sample', description: 'Fallback description', price: 'Price on request', images: ['image.jpeg'] };
+  const site = runSite(document, { products: [fallbackProduct], getProductById: () => undefined }, '?id=unknown');
+  site.renderProductPage();
+  assert.equal(view.hidden, true); assert.equal(missing.hidden, false); assert.match(related.innerHTML, /product-card/); assert.equal(document.title, 'Product Details | Elegance Africa'); assert.equal(canonical.attributes.href, 'product.html'); assert.equal(descriptionMeta.attributes.content, 'View the selected Elegance Africa hair piece and ask about price and availability.'); assert.equal(titleMeta.attributes.content, 'Product Details | Elegance Africa'); assert.equal(openGraphDescription.attributes.content, 'View the selected Elegance Africa hair piece and ask about price and availability.'); assert.equal(imageMeta.attributes.content, 'assets/images/nia-wave-3.jpeg'); assert.equal(urlMeta.attributes.content, 'product.html'); assert.equal(schema.removed, true);
 });

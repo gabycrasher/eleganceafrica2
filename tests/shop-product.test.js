@@ -9,7 +9,7 @@ test('Shop exposes all approved filters and catalogue states', () => {
   assert.match(html, /Fragrance/); assert.match(html, /Beauty/); assert.match(html, /Accessories/); assert.match(html, /Expanding soon/);
   assert.match(html, /<noscript>[\s\S]*?<\/noscript>/);
   for (const id of ['amara-coil', 'zuri-straight', 'nia-wave', 'imani-crop', 'sanaa-burgundy', 'aya-bob']) {
-    assert.match(html, new RegExp(`product\\.html\\?id=${id}`));
+    assert.match(html, new RegExp(`products\\/${id}\\.html`));
   }
 });
 

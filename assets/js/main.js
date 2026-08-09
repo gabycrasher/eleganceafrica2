@@ -35,7 +35,7 @@
   }
 
   function productCardMarkup(product, index = 0) {
-    return `<article class="col-12 col-md-6 col-xl-3"><a class="product-card" href="product.html?id=${encodeURIComponent(product.id)}"><span class="product-card__media"><img src="${product.images[0]}" alt="${product.name}, ${product.description}" loading="lazy"></span><span class="product-card__meta"><small>${product.category}</small><strong>${product.name}</strong><span>${product.price}</span></span></a></article>`;
+    return `<article class="col-12 col-md-6 col-xl-3"><a class="product-card" href="products/${encodeURIComponent(product.id)}.html"><span class="product-card__media"><img src="${product.images[0]}" alt="${product.name}, ${product.description}" loading="lazy"></span><span class="product-card__meta"><small>${product.category}</small><strong>${product.name}</strong><span>${product.price}</span></span></a></article>`;
   }
 
   function renderFeaturedProducts() {
@@ -51,7 +51,7 @@
     function showStep(index, moveFocus = false) { activeStep = index; steps.forEach((step, stepIndex) => { step.hidden = stepIndex !== index; }); quiz.querySelectorAll('.quiz-progress span').forEach((item, itemIndex) => item.classList.toggle('is-active', itemIndex <= index)); if (moveFocus) { const legend = steps[index].querySelector('legend'); legend.tabIndex = -1; legend.focus(); } }
     quiz.querySelectorAll('[data-quiz-next]').forEach((button) => button.addEventListener('click', () => { if (!steps[activeStep].querySelector('input:checked')) { steps[activeStep].querySelector('input')?.focus(); return; } showStep(activeStep + 1, true); }));
     quiz.querySelectorAll('[data-quiz-back]').forEach((button) => button.addEventListener('click', () => showStep(activeStep - 1, true)));
-    form.addEventListener('submit', (event) => { event.preventDefault(); const product = root.EleganceCatalog.recommendProduct(Object.fromEntries(new FormData(form).entries())); result.innerHTML = `<p class="eyebrow">Your signature</p><h3>${product.name}</h3><p>${product.description}</p><a class="btn btn-gold" href="product.html?id=${encodeURIComponent(product.id)}">View ${product.name}</a>`; form.hidden = true; result.hidden = false; });
+    form.addEventListener('submit', (event) => { event.preventDefault(); const product = root.EleganceCatalog.recommendProduct(Object.fromEntries(new FormData(form).entries())); result.innerHTML = `<p class="eyebrow">Your signature</p><h3>${product.name}</h3><p>${product.description}</p><a class="btn btn-gold" href="products/${encodeURIComponent(product.id)}.html">View ${product.name}</a>`; form.hidden = true; result.hidden = false; });
     showStep(0);
   }
 
@@ -92,7 +92,7 @@
     const product = root.EleganceCatalog.getProductById(new URLSearchParams(location.search).get('id'));
     const missing = document.querySelector('[data-product-not-found]');
     const related = document.querySelector('[data-related-grid]');
-    if (!product) { document.querySelector('[data-product-schema]')?.remove(); view.hidden = true; missing.hidden = false; related.innerHTML = root.EleganceCatalog.products.slice(0, 4).map(productCardMarkup).join(''); return; }
+    if (!product) { resetProductMetadata(); view.hidden = true; missing.hidden = false; related.innerHTML = root.EleganceCatalog.products.slice(0, 4).map(productCardMarkup).join(''); return; }
     view.hidden = false; document.title = `${product.name} | Elegance Africa`;
     updateProductMetadata(product);
     document.querySelector('[data-product-name]').textContent = product.name;
@@ -128,6 +128,19 @@
       '@context': 'https://schema.org', '@type': 'Product', name: product.name, image: product.images,
       description: product.description, brand: { '@type': 'Organization', name: 'Elegance Africa' }
     }).replace(/</g, '\\u003c');
+  }
+
+  function resetProductMetadata() {
+    const description = 'View the selected Elegance Africa hair piece and ask about price and availability.';
+    const setContent = (selector, content) => { const element = document.querySelector(selector); if (element) element.setAttribute('content', content); };
+    document.title = 'Product Details | Elegance Africa';
+    document.querySelector('[data-product-canonical]')?.setAttribute('href', 'product.html');
+    setContent('meta[name="description"]', description);
+    setContent('[data-product-og-title]', 'Product Details | Elegance Africa');
+    setContent('[data-product-og-description]', description);
+    setContent('[data-product-og-image]', 'assets/images/nia-wave-3.jpeg');
+    setContent('[data-product-og-url]', 'product.html');
+    document.querySelector('[data-product-schema]')?.remove();
   }
 
   function selectedProductOptions() {
