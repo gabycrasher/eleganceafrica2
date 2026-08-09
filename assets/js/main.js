@@ -205,8 +205,8 @@
       toggle.setAttribute('aria-expanded', String(open));
     }
     toggle.addEventListener('click', (event) => {
-      if (root.bootstrap?.Offcanvas) return;
       event.preventDefault();
+      event.stopImmediatePropagation();
       toggleMobileMenu(!menu.classList.contains('mobile-menu-open'));
     });
     menu.querySelector('[data-bs-dismiss="offcanvas"]')?.addEventListener('click', () => toggleMobileMenu(false));
