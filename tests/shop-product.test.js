@@ -23,3 +23,12 @@ test('product page exposes selector and styling hooks', () => {
   const html = fs.readFileSync('product.html', 'utf8');
   for (const hook of ['data-product-length', 'data-product-density', 'data-product-style']) assert.match(html, new RegExp(hook));
 });
+
+test('product page behavior uses active-product options and refreshes its enquiry URL', () => {
+  const script = fs.readFileSync('assets/js/main.js', 'utf8');
+  assert.match(script, /product\.wearItHow/);
+  assert.match(script, /product\.lengths\.map/);
+  assert.match(script, /product\.densities\.map/);
+  assert.match(script, /length\.addEventListener\('change', updateEnquiry\)/);
+  assert.match(script, /density\.addEventListener\('change', updateEnquiry\)/);
+});

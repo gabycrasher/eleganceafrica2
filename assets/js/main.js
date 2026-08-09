@@ -48,9 +48,9 @@
     const quiz = document.querySelector('[data-signature-quiz]');
     if (!quiz || !root.EleganceCatalog) return;
     const form = quiz.querySelector('form'); const steps = [...quiz.querySelectorAll('[data-quiz-step]')]; const result = quiz.querySelector('[data-quiz-result]'); let activeStep = 0;
-    function showStep(index) { activeStep = index; steps.forEach((step, stepIndex) => { step.hidden = stepIndex !== index; }); quiz.querySelectorAll('.quiz-progress span').forEach((item, itemIndex) => item.classList.toggle('is-active', itemIndex <= index)); }
-    quiz.querySelectorAll('[data-quiz-next]').forEach((button) => button.addEventListener('click', () => { if (!steps[activeStep].querySelector('input:checked')) { steps[activeStep].querySelector('input')?.focus(); return; } showStep(activeStep + 1); }));
-    quiz.querySelectorAll('[data-quiz-back]').forEach((button) => button.addEventListener('click', () => showStep(activeStep - 1)));
+    function showStep(index, moveFocus = false) { activeStep = index; steps.forEach((step, stepIndex) => { step.hidden = stepIndex !== index; }); quiz.querySelectorAll('.quiz-progress span').forEach((item, itemIndex) => item.classList.toggle('is-active', itemIndex <= index)); if (moveFocus) { const legend = steps[index].querySelector('legend'); legend.tabIndex = -1; legend.focus(); } }
+    quiz.querySelectorAll('[data-quiz-next]').forEach((button) => button.addEventListener('click', () => { if (!steps[activeStep].querySelector('input:checked')) { steps[activeStep].querySelector('input')?.focus(); return; } showStep(activeStep + 1, true); }));
+    quiz.querySelectorAll('[data-quiz-back]').forEach((button) => button.addEventListener('click', () => showStep(activeStep - 1, true)));
     form.addEventListener('submit', (event) => { event.preventDefault(); const product = root.EleganceCatalog.recommendProduct(Object.fromEntries(new FormData(form).entries())); result.innerHTML = `<p class="eyebrow">Your signature</p><h3>${product.name}</h3><p>${product.description}</p><a class="btn btn-gold" href="product.html?id=${encodeURIComponent(product.id)}">View ${product.name}</a>`; form.hidden = true; result.hidden = false; });
     showStep(0);
   }
