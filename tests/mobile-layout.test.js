@@ -18,3 +18,10 @@ test('mobile navigation has a visible touch-friendly toggler and closes after na
   assert.match(script, /function initMobileNavigation\(/);
   assert.match(script, /bootstrap\.Offcanvas\.getOrCreateInstance/);
 });
+
+test('mobile navigation remains usable when Bootstrap is unavailable', () => {
+  assert.match(script, /function toggleMobileMenu\(/);
+  assert.match(script, /mobile-menu-open/);
+  assert.match(css, /\.offcanvas\.mobile-menu-open\s*\{[^}]*transform:\s*translateX\(0\)/i);
+  assert.match(css, /\.site-header\s*\{[^}]*border-bottom:\s*0/i);
+});

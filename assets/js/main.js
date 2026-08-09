@@ -197,10 +197,23 @@
 
   function initMobileNavigation() {
     const menu = document.querySelector('#siteMenu');
-    if (!menu || !root.bootstrap?.Offcanvas) return;
+    const toggle = document.querySelector('[data-bs-target="#siteMenu"]');
+    if (!menu || !toggle) return;
+    function toggleMobileMenu(open) {
+      menu.classList.toggle('mobile-menu-open', open);
+      document.body.classList.toggle('menu-is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    }
+    toggle.addEventListener('click', (event) => {
+      if (root.bootstrap?.Offcanvas) return;
+      event.preventDefault();
+      toggleMobileMenu(!menu.classList.contains('mobile-menu-open'));
+    });
+    menu.querySelector('[data-bs-dismiss="offcanvas"]')?.addEventListener('click', () => toggleMobileMenu(false));
     menu.querySelectorAll('a[href]').forEach((link) => link.addEventListener('click', () => {
       if (root.matchMedia('(max-width: 991.98px)').matches) {
-        root.bootstrap.Offcanvas.getOrCreateInstance(menu).hide();
+        if (root.bootstrap?.Offcanvas) root.bootstrap.Offcanvas.getOrCreateInstance(menu).hide();
+        toggleMobileMenu(false);
       }
     }));
   }
