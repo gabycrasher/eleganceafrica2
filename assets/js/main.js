@@ -181,6 +181,45 @@
     });
   }
 
+  function initMotionSystem() {
+    document.documentElement.classList.add('motion-safe');
+    const progress = document.querySelector('[data-scroll-progress] span');
+    const header = document.querySelector('.site-header');
+    if (progress || header) {
+      const update = () => {
+        const max = Math.max(1, document.documentElement.scrollHeight - root.innerHeight);
+        if (progress) progress.style.transform = `scaleX(${Math.min(1, root.scrollY / max)})`;
+        header?.classList.toggle('is-scrolled', root.scrollY > 16);
+      };
+      root.addEventListener('scroll', update, { passive: true }); update();
+    }
+  }
+
+  function initInspirationRail() {
+    const rail = document.querySelector('[data-inspiration-rail]');
+    const track = document.querySelector('[data-inspiration-track]');
+    if (!rail || !track || !root.EleganceCatalog) return;
+    track.innerHTML = root.EleganceCatalog.products.map((product) => `<a class="inspiration-card" href="${product.staticPath}"><img src="${product.images[0]}" alt="${product.name}" loading="lazy"><span>${product.name.replace('The ', '')}</span></a>`).join('');
+    const step = () => Math.max(240, track.clientWidth * .72);
+    rail.querySelector('[data-rail-prev]')?.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    rail.querySelector('[data-rail-next]')?.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+  }
+
+  function initRecentlyViewed() {
+    const section = document.querySelector('[data-recently-viewed]');
+    const productId = new URLSearchParams(location.search).get('id');
+    if (!section || !productId || !root.EleganceCatalog) return;
+    try {
+      const key = 'elegance-africa-recent-products';
+      const ids = JSON.parse(root.localStorage.getItem(key) || '[]').filter((id) => id !== productId);
+      ids.unshift(productId); root.localStorage.setItem(key, JSON.stringify(ids.slice(0, 4)));
+      const products = ids.slice(1).map(root.EleganceCatalog.getProductById).filter(Boolean);
+      if (!products.length) return;
+      section.hidden = false;
+      section.querySelector('[data-recently-viewed-grid]').innerHTML = products.map(productCardMarkup).join('');
+    } catch (_) { /* Storage is optional; the page remains fully usable. */ }
+  }
+
   function init() {
     document.documentElement.classList.add('js-ready');
     markActiveNavigation();
@@ -193,6 +232,9 @@
     initStaticProductEnquiry();
     initContactForm();
     initReveal();
+    initMotionSystem();
+    initInspirationRail();
+    initRecentlyViewed();
   }
 
   root.EleganceSite = { init, initSignatureQuiz, renderProductPage, initStaticProductEnquiry };
