@@ -88,7 +88,8 @@ a { color: inherit; }
   .brand-logo { width: 42px; }
   .navbar-brand { font-size: .9rem; max-width: calc(100% - 64px); }
   .offcanvas.offcanvas-end { background: var(--paper); border-left: 1px solid var(--line); box-shadow: -20px 0 60px rgba(11,10,9,.16); transform: translateX(100%); transition: transform .35s cubic-bezier(.2,.8,.2,1); visibility: visible; width: min(88vw, 23rem); }
-  .offcanvas.offcanvas-end.show, .offcanvas.mobile-menu-open { transform: translateX(0); }
+  .offcanvas.offcanvas-end.show { transform: translateX(0); }
+  .offcanvas.mobile-menu-open { display: flex !important; opacity: 1; transform: translateX(0); visibility: visible !important; z-index: 2000; }
   body.menu-is-open { overflow: hidden; }
   .offcanvas-header { border-bottom: 1px solid var(--line); padding: 1.25rem; }
   .offcanvas-body { display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem; }
