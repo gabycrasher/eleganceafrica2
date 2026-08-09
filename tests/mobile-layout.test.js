@@ -28,3 +28,16 @@ test('mobile navigation remains usable when Bootstrap is unavailable', () => {
   assert.match(css, /\.offcanvas\.mobile-menu-open\s*\{[^}]*display:\s*flex\s*!important/i);
   assert.match(css, /\.offcanvas\.mobile-menu-open\s*\{[^}]*z-index:\s*2000/i);
 });
+
+test('responsive navigation provides separate desktop and mobile navigation surfaces', () => {
+  assert.match(script, /function initDesktopNavigation\(/);
+  assert.match(script, /desktop-navigation/);
+  assert.match(css, /\.desktop-navigation\s*\{[^}]*display:\s*none/i);
+  assert.match(css, /@media \(min-width: 992px\)[\s\S]*?\.desktop-navigation\s*\{[^}]*display:\s*flex/i);
+});
+
+test('opened mobile navigation renders its full-height link list', () => {
+  assert.match(css, /#siteMenu\.mobile-menu-open\s+\.offcanvas-body\s*\{[^}]*flex:\s*1/i);
+  assert.match(css, /#siteMenu\.mobile-menu-open\s+\.navbar-nav\s*\{[^}]*display:\s*flex\s*!important/i);
+  assert.match(css, /#siteMenu\.mobile-menu-open\s+\.nav-link\s*\{[^}]*display:\s*block\s*!important/i);
+});

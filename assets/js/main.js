@@ -218,6 +218,20 @@
     }));
   }
 
+  function initDesktopNavigation() {
+    const container = document.querySelector('.site-header .navbar .container');
+    const mobileMenu = document.querySelector('#siteMenu');
+    if (!container || !mobileMenu || container.querySelector('.desktop-navigation')) return;
+    const links = mobileMenu.querySelector('.navbar-nav');
+    const action = mobileMenu.querySelector('.btn');
+    if (!links || !action) return;
+    const desktopNavigation = document.createElement('div');
+    desktopNavigation.className = 'desktop-navigation';
+    desktopNavigation.setAttribute('aria-label', 'Desktop navigation');
+    desktopNavigation.append(links.cloneNode(true), action.cloneNode(true));
+    container.append(desktopNavigation);
+  }
+
   function initInspirationRail() {
     const rail = document.querySelector('[data-inspiration-rail]');
     const track = document.querySelector('[data-inspiration-track]');
@@ -257,6 +271,7 @@
     initReveal();
     initMotionSystem();
     initMobileNavigation();
+    initDesktopNavigation();
     initInspirationRail();
     initRecentlyViewed();
   }
