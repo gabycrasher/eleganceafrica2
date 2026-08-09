@@ -43,6 +43,8 @@ test('product page renders active options and refreshes WhatsApp enquiry after a
   const site = runSite(document, { products: [product], getProductById: () => product, buildWhatsAppUrl: (name, options) => `${name}|${options.length}|${options.density}` }, '?id=sample');
   site.renderProductPage();
   assert.equal(view.hidden, false); assert.equal(style.textContent, 'Wear it boldly.'); assert.match(length.innerHTML, /16&quot;|16"/); assert.match(density.innerHTML, /180%/); assert.equal(whatsapp.href, 'Sample|12"|130%');
-  length.value = '16"'; density.value = '180%'; length.emit('change'); density.emit('change');
+  density.value = ''; length.value = '16"'; length.emit('change');
+  assert.equal(whatsapp.href, 'Sample|16"|');
+  density.value = '180%'; density.emit('change');
   assert.equal(whatsapp.href, 'Sample|16"|180%'); assert.equal(mainImage.src, 'image.jpeg');
 });
