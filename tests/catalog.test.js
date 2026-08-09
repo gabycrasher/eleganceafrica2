@@ -32,3 +32,16 @@ test('WhatsApp enquiry targets the approved business number', () => {
   assert.match(url.searchParams.get('text'), /The Aya Bob/);
   assert.match(url.searchParams.get('text'), /available options and price/i);
 });
+
+test('catalogue recommends a selected signature and carries enquiry options', () => {
+  const result = catalog.recommendProduct({ texture: 'wavy', occasion: 'evening', preference: 'soft' });
+  assert.equal(result.id, 'nia-wave');
+  assert.deepEqual(result.lengths, ['12"', '14"', '16"', '18"']);
+  assert.match(result.wearItHow, /evening/i);
+});
+
+test('WhatsApp enquiry includes selected length and density', () => {
+  const url = catalog.buildWhatsAppUrl('The Nia Wave', { length: '16"', density: '150%' });
+  assert.match(decodeURIComponent(url), /Length: 16"/);
+  assert.match(decodeURIComponent(url), /Density: 150%/);
+});
