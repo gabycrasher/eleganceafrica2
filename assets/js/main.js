@@ -145,6 +145,6 @@
     initReveal();
   }
 
-  root.EleganceSite = { init };
+  root.EleganceSite = { init, initSignatureQuiz, renderProductPage };
   document.addEventListener('DOMContentLoaded', init);
 }(window));

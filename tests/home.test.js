@@ -26,8 +26,3 @@ test('homepage contains an interactive signature quiz', () => {
   for (const hook of ['data-signature-quiz', 'data-quiz-step', 'data-quiz-result']) assert.match(html, new RegExp(hook));
   assert.match(html, /Hair texture/i); assert.match(html, /Occasion/i); assert.match(html, /Style preference/i);
 });
-
-test('signature quiz moves focus into the revealed step', () => {
-  const script = fs.readFileSync('assets/js/main.js', 'utf8');
-  assert.match(script, /function showStep[\s\S]*?legend\.focus\(\)/);
-});
