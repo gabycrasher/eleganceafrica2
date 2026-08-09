@@ -20,3 +20,9 @@ test('homepage contains the complete editorial journey', () => {
   assert.match(html, /Newsletter integration is being prepared/);
   assert.match(html, /<noscript>[\s\S]*?product\.html\?id=amara-coil[\s\S]*?Price on request[\s\S]*?<\/noscript>/);
 });
+
+test('homepage contains an interactive signature quiz', () => {
+  const html = fs.readFileSync('index.html', 'utf8');
+  for (const hook of ['data-signature-quiz', 'data-quiz-step', 'data-quiz-result']) assert.match(html, new RegExp(hook));
+  assert.match(html, /Hair texture/i); assert.match(html, /Occasion/i); assert.match(html, /Style preference/i);
+});

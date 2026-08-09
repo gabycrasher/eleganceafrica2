@@ -18,3 +18,8 @@ test('Product page exposes reusable gallery, facts, CTA, and fallback hooks', ()
   for (const hook of ['data-product-view', 'data-product-not-found', 'data-gallery-main', 'data-gallery-thumbs', 'data-product-name', 'data-product-price', 'data-product-description', 'data-product-availability', 'data-product-care', 'data-product-whatsapp', 'data-related-grid']) assert.match(html, new RegExp(hook));
   assert.match(html, /Available options are confirmed personally/);
 });
+
+test('product page exposes selector and styling hooks', () => {
+  const html = fs.readFileSync('product.html', 'utf8');
+  for (const hook of ['data-product-length', 'data-product-density', 'data-product-style']) assert.match(html, new RegExp(hook));
+});

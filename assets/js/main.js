@@ -44,6 +44,17 @@
     grid.innerHTML = root.EleganceCatalog.products.filter((product) => product.featured).slice(0, 4).map(productCardMarkup).join('');
   }
 
+  function initSignatureQuiz() {
+    const quiz = document.querySelector('[data-signature-quiz]');
+    if (!quiz || !root.EleganceCatalog) return;
+    const form = quiz.querySelector('form'); const steps = [...quiz.querySelectorAll('[data-quiz-step]')]; const result = quiz.querySelector('[data-quiz-result]'); let activeStep = 0;
+    function showStep(index) { activeStep = index; steps.forEach((step, stepIndex) => { step.hidden = stepIndex !== index; }); quiz.querySelectorAll('.quiz-progress span').forEach((item, itemIndex) => item.classList.toggle('is-active', itemIndex <= index)); }
+    quiz.querySelectorAll('[data-quiz-next]').forEach((button) => button.addEventListener('click', () => { if (!steps[activeStep].querySelector('input:checked')) { steps[activeStep].querySelector('input')?.focus(); return; } showStep(activeStep + 1); }));
+    quiz.querySelectorAll('[data-quiz-back]').forEach((button) => button.addEventListener('click', () => showStep(activeStep - 1)));
+    form.addEventListener('submit', (event) => { event.preventDefault(); const product = root.EleganceCatalog.recommendProduct(Object.fromEntries(new FormData(form).entries())); result.innerHTML = `<p class="eyebrow">Your signature</p><h3>${product.name}</h3><p>${product.description}</p><a class="btn btn-gold" href="product.html?id=${encodeURIComponent(product.id)}">View ${product.name}</a>`; form.hidden = true; result.hidden = false; });
+    showStep(0);
+  }
+
   function initNewsletter() {
     const form = document.querySelector('[data-newsletter-form]');
     if (!form) return;
@@ -88,11 +99,22 @@
     document.querySelector('[data-product-description]').textContent = product.description;
     document.querySelector('[data-product-availability]').textContent = product.availability;
     document.querySelector('[data-product-care]').textContent = product.care;
+    const selectorTemplate = document.querySelector('[data-product-selector-template]');
+    document.querySelector('[data-product-description]').after(selectorTemplate.content.cloneNode(true));
+    document.querySelector('[data-product-style]').textContent = product.wearItHow;
     const mainImage = document.querySelector('[data-gallery-main]'); mainImage.src = product.images[0]; mainImage.alt = `${product.name}, ${product.description}`;
-    document.querySelector('[data-product-whatsapp]').href = root.EleganceCatalog.buildWhatsAppUrl(product.name);
+    const length = document.querySelector('[data-product-length]'); const density = document.querySelector('[data-product-density]');
+    length.innerHTML = product.lengths.map((option) => `<option value="${option}">${option}</option>`).join('');
+    density.innerHTML = product.densities.map((option) => `<option value="${option}">${option}</option>`).join('');
+    function updateEnquiry() { document.querySelector('[data-product-whatsapp]').href = root.EleganceCatalog.buildWhatsAppUrl(product.name, selectedProductOptions()); }
+    length.addEventListener('change', updateEnquiry); density.addEventListener('change', updateEnquiry); updateEnquiry();
     document.querySelector('[data-gallery-thumbs]').innerHTML = product.images.map((image, index) => `<button type="button" data-gallery-image="${image}" aria-label="View image ${index + 1} of ${product.name}"><img src="${image}" alt=""></button>`).join('');
     document.querySelectorAll('[data-gallery-image]').forEach((button) => button.addEventListener('click', () => { mainImage.src = button.dataset.galleryImage; }));
     related.innerHTML = root.EleganceCatalog.products.filter((item) => item.id !== product.id).slice(0, 4).map(productCardMarkup).join('');
+  }
+
+  function selectedProductOptions() {
+    return { length: document.querySelector('[data-product-length]')?.value || '', density: document.querySelector('[data-product-density]')?.value || '' };
   }
 
   function initContactForm() {
@@ -115,6 +137,7 @@
     markActiveNavigation();
     initImageFallbacks();
     renderFeaturedProducts();
+    initSignatureQuiz();
     initNewsletter();
     initCatalogFilters();
     renderProductPage();
