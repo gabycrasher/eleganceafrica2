@@ -71,3 +71,37 @@ test('invalid dynamic product ids restore neutral metadata and remove structured
   site.renderProductPage();
   assert.equal(view.hidden, true); assert.equal(missing.hidden, false); assert.match(related.innerHTML, /product-card/); assert.equal(document.title, 'Product Details | Elegance Africa'); assert.equal(canonical.attributes.href, 'product.html'); assert.equal(descriptionMeta.attributes.content, 'View the selected Elegance Africa hair piece and ask about price and availability.'); assert.equal(titleMeta.attributes.content, 'Product Details | Elegance Africa'); assert.equal(openGraphDescription.attributes.content, 'View the selected Elegance Africa hair piece and ask about price and availability.'); assert.equal(imageMeta.attributes.content, 'assets/images/nia-wave-3.jpeg'); assert.equal(urlMeta.attributes.content, 'product.html'); assert.equal(typeMeta.attributes.content, 'website'); assert.equal(schema.removed, true);
 });
+
+test('static product enquiry starts product-specific and includes only chosen selections', () => {
+  const length = Object.assign(new Element(), { value: '' });
+  const density = Object.assign(new Element(), { value: '' });
+  const whatsapp = new Element();
+  const selectors = new Map([
+    ['[data-product-length]', length],
+    ['[data-product-density]', density],
+    ['[data-static-product-whatsapp]', whatsapp]
+  ]);
+  const document = {
+    body: { dataset: { productId: 'nia-wave' } },
+    documentElement: { classList: { add() {} } },
+    addEventListener() {},
+    querySelector: (selector) => selectors.get(selector) || null,
+    querySelectorAll: () => []
+  };
+  const product = { id: 'nia-wave', name: 'The Nia Wave' };
+  const calls = [];
+  const site = runSite(document, {
+    getProductById: (id) => id === product.id ? product : undefined,
+    buildWhatsAppUrl: (name, options) => { calls.push([name, { ...options }]); return `${name}|${options.length}|${options.density}`; }
+  });
+
+  site.initStaticProductEnquiry();
+  assert.equal(whatsapp.href, 'The Nia Wave||');
+  assert.deepEqual(calls[0], ['The Nia Wave', { length: '', density: '' }]);
+
+  length.value = '16"'; length.emit('change');
+  assert.equal(whatsapp.href, 'The Nia Wave|16"|');
+
+  density.value = '180%'; density.emit('change');
+  assert.equal(whatsapp.href, 'The Nia Wave|16"|180%');
+});

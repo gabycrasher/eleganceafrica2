@@ -95,6 +95,17 @@ test('site includes share metadata and a branded 404 page', () => {
   for (const value of ['<html lang="en">', 'rel="icon" href="assets/images/favicon.svg"', 'id="site-header"', 'id="main-content"', 'site-footer', 'wa\.me/256765897583']) assert.match(notFound, new RegExp(value));
 });
 
+test('general pages publish complete default sharing metadata', () => {
+  const generalPages = ['shop.html', 'about.html', 'contact.html', 'delivery-faq.html', 'policies.html', '404.html'];
+  for (const page of generalPages) {
+    const html = fs.readFileSync(page, 'utf8');
+    assert.match(html, /<meta property="og:title" content="[^"]+">/, `${page} needs an Open Graph title`);
+    assert.match(html, /<meta property="og:description" content="[^"]+">/, `${page} needs an Open Graph description`);
+    assert.match(html, /<meta property="og:image" content="assets\/images\/[^"]+">/, `${page} needs a default sharing image`);
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image">/, `${page} needs a Twitter card type`);
+  }
+});
+
 test('product page has a structured-data hook', () => {
   const html = fs.readFileSync('product.html', 'utf8');
   assert.match(html, /data-product-schema/);
@@ -111,5 +122,30 @@ test('static product pages expose product-specific sharing metadata without offe
     assert.match(html, /name="description"/); assert.match(html, /property="og:title"/); assert.match(html, /property="og:description"/); assert.match(html, /property="og:image"/); assert.match(html, /name="twitter:title"/); assert.match(html, /name="twitter:image"/);
     assert.match(html, new RegExp(`href="\.\.\/products/${id}\\.html"`)); assert.match(html, new RegExp(`\.\.\/assets\/images\/${image}`)); assert.match(html, /"@type":"Product"/); assert.match(html, /"@type":"Organization"/); assert.doesNotMatch(html, /"price"\s*:/); assert.doesNotMatch(html, /"@type":"Offer"/);
     assert.match(html, /bootstrap@5\.3\.8/); assert.match(html, /fonts\.googleapis\.com/); assert.match(html, /fonts\.gstatic\.com/);
+  }
+});
+
+test('static product journeys expose product-specific guidance and optional enquiry selections', () => {
+  const products = [
+    ['amara-coil', 'The Amara Coil', 'Wear it with a simple neckline when you want a textured look to carry the occasion.'],
+    ['zuri-straight', 'The Zuri Straight', 'Wear it sleek for polished daytime plans or a refined evening entrance.'],
+    ['nia-wave', 'The Nia Wave', 'Wear it for an evening occasion with soft makeup and a clean, understated neckline.'],
+    ['imani-crop', 'The Imani Crop', 'Wear it with sculptural earrings when you want the short silhouette to frame your face.'],
+    ['sanaa-burgundy', 'The Sanaa Burgundy', 'Wear it for a bold occasion with a neutral outfit that lets the burgundy tone take focus.'],
+    ['aya-bob', 'The Aya Bob', 'Wear it with a tailored look for a confident occasion that calls for a clean silhouette.']
+  ];
+
+  for (const [id, name, guidance] of products) {
+    const html = fs.readFileSync(`products/${id}.html`, 'utf8');
+    assert.match(html, new RegExp(`data-product-id="${id}"`));
+    assert.ok(html.includes(guidance), `${id} needs its own wear-it-how guidance`);
+    assert.match(html, /data-product-length[\s\S]*?<option value="">Not selected<\/option>/);
+    assert.match(html, /data-product-density[\s\S]*?<option value="">Not selected<\/option>/);
+    assert.match(html, /data-static-product-whatsapp/);
+    const enquiry = html.match(/data-static-product-whatsapp[^>]*href="([^"]+)"/)?.[1] || html.match(/href="([^"]+)"[^>]*data-static-product-whatsapp/)?.[1] || '';
+    assert.match(enquiry, /^https:\/\/wa\.me\/256765897583\?text=/);
+    assert.match(decodeURIComponent(enquiry), new RegExp(name));
+    assert.match(html, /\.\.\/assets\/js\/products\.js/);
+    assert.match(html, /\.\.\/assets\/js\/main\.js/);
   }
 });

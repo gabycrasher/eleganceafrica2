@@ -105,8 +105,8 @@
     document.querySelector('[data-product-style]').textContent = product.wearItHow;
     const mainImage = document.querySelector('[data-gallery-main]'); mainImage.src = product.images[0]; mainImage.alt = `${product.name}, ${product.description}`;
     const length = document.querySelector('[data-product-length]'); const density = document.querySelector('[data-product-density]');
-    length.innerHTML = product.lengths.map((option) => `<option value="${option}">${option}</option>`).join('');
-    density.innerHTML = product.densities.map((option) => `<option value="${option}">${option}</option>`).join('');
+    length.innerHTML = '<option value="">Not selected</option>' + product.lengths.map((option) => `<option value="${option}">${option}</option>`).join('');
+    density.innerHTML = '<option value="">Not selected</option>' + product.densities.map((option) => `<option value="${option}">${option}</option>`).join('');
     function updateEnquiry() { document.querySelector('[data-product-whatsapp]').href = root.EleganceCatalog.buildWhatsAppUrl(product.name, selectedProductOptions()); }
     length.addEventListener('change', updateEnquiry); density.addEventListener('change', updateEnquiry); updateEnquiry();
     document.querySelector('[data-gallery-thumbs]').innerHTML = product.images.map((image, index) => `<button type="button" data-gallery-image="${image}" aria-label="View image ${index + 1} of ${product.name}"><img src="${image}" alt=""></button>`).join('');
@@ -148,6 +148,24 @@
     return { length: document.querySelector('[data-product-length]')?.value || '', density: document.querySelector('[data-product-density]')?.value || '' };
   }
 
+  function initStaticProductEnquiry() {
+    const productId = document.body.dataset.productId;
+    const link = document.querySelector('[data-static-product-whatsapp]');
+    if (!productId || !link || !root.EleganceCatalog) return;
+    const product = root.EleganceCatalog.getProductById(productId);
+    if (!product) return;
+    const length = document.querySelector('[data-product-length]');
+    const density = document.querySelector('[data-product-density]');
+    function updateEnquiry() {
+      link.href = root.EleganceCatalog.buildWhatsAppUrl(product.name, {
+        length: length?.value || '', density: density?.value || ''
+      });
+    }
+    length?.addEventListener('change', updateEnquiry);
+    density?.addEventListener('change', updateEnquiry);
+    updateEnquiry();
+  }
+
   function initContactForm() {
     const form = document.querySelector('[data-contact-form]');
     if (!form) return;
@@ -172,10 +190,11 @@
     initNewsletter();
     initCatalogFilters();
     renderProductPage();
+    initStaticProductEnquiry();
     initContactForm();
     initReveal();
   }
 
-  root.EleganceSite = { init, initSignatureQuiz, renderProductPage };
+  root.EleganceSite = { init, initSignatureQuiz, renderProductPage, initStaticProductEnquiry };
   document.addEventListener('DOMContentLoaded', init);
 }(window));
